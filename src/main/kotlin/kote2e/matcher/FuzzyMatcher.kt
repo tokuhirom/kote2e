@@ -49,9 +49,14 @@ class FuzzyMatcher(
                 }
             }
             JsonNodeType.MISSING -> {
-
+                TODO("unsupported")
             }
             JsonNodeType.NULL -> {
+                if (got.nodeType == JsonNodeType.NULL) {
+                    return listOf()
+                } else {
+                    return listOf("$path: Expected ${expected.toPrettyString()} but got ${got.toPrettyString()}")
+                }
 
             }
             JsonNodeType.OBJECT -> {
@@ -80,8 +85,6 @@ class FuzzyMatcher(
                     return listOf("$path: Expected ${expected.toPrettyString()} but got ${got.toPrettyString()}")
                 }
             }
-            JsonNodeType.POJO -> {
-            }
             JsonNodeType.STRING -> {
                 if (got.nodeType == JsonNodeType.STRING) {
                     if (got.asText() == expected.asText()) {
@@ -92,6 +95,8 @@ class FuzzyMatcher(
                     return matchMarker(expected.asText(), got, path)
                 }
                 return listOf("$path: Expected ${expected.toPrettyString()} but got ${got.toPrettyString()}")
+            }
+            JsonNodeType.POJO -> {
             }
         }
         throw IllegalStateException("[BUG] Should not reach here: ${expected.nodeType}")

@@ -20,6 +20,10 @@ internal class FuzzyMatcherTest {
     companion object {
         @JvmStatic
         fun argsss() = listOf(
+            // null
+            arguments("null", "null", listOf<String>()),
+            arguments("false", "null", listOf("\$: Expected null but got false")),
+
             // boolean
             arguments("false", "false", listOf<String>()),
             arguments("true", "false", listOf("\$: Expected false but got true")),
