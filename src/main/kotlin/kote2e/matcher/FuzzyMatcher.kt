@@ -19,12 +19,23 @@ class FuzzyMatcher(
         return match(objectMapper.readTree(got), expected)
     }
 
-    private fun walk(got: JsonNode, expected: JsonNode, path: String):List<String> {
+    private fun walk(got: JsonNode, expected: JsonNode, path: String): List<String> {
         when (expected.nodeType!!) {
             JsonNodeType.ARRAY -> {
-            }
-            JsonNodeType.BINARY -> {
+                if (got.nodeType == JsonNodeType.ARRAY) {
+                    val expectedList = expected.asSequence().toList()
+                    val gotList = got.asSequence().toList()
+                    if (gotList.size != expectedList.size) {
+                        return listOf("$path: Expected list size is ${expectedList.size} but got ${gotList.size}: ${got.toPrettyString()}")
+                    }
 
+                    return expectedList.indices
+                        .flatMap { i ->
+                            walk(got.elementAt(i), expected.elementAt(i), path + "." + (i + 1))
+                        }.toList()
+                } else {
+                    return listOf("$path: Expected ${expected.toPrettyString()} but got ${got.toPrettyString()}")
+                }
             }
             JsonNodeType.BOOLEAN -> {
                 if (got.nodeType == JsonNodeType.BOOLEAN) {
@@ -48,22 +59,18 @@ class FuzzyMatcher(
                     return listOf("$path: Expected ${expected.toPrettyString()} but got ${got.toPrettyString()}")
                 }
             }
-            JsonNodeType.MISSING -> {
-                TODO("unsupported")
-            }
             JsonNodeType.NULL -> {
                 if (got.nodeType == JsonNodeType.NULL) {
                     return listOf()
                 } else {
                     return listOf("$path: Expected ${expected.toPrettyString()} but got ${got.toPrettyString()}")
                 }
-
             }
             JsonNodeType.OBJECT -> {
                 if (got.nodeType == JsonNodeType.OBJECT) {
                     val retval = ArrayList<String>()
 
-                    expected.fields().forEach {mutableEntry: MutableMap.MutableEntry<String, JsonNode>? ->
+                    expected.fields().forEach { mutableEntry: MutableMap.MutableEntry<String, JsonNode>? ->
                         val key = mutableEntry?.key
                         if (got.has(key)) {
                             val r = walk(mutableEntry?.value!!, got[key], path + "." + key)
@@ -96,14 +103,15 @@ class FuzzyMatcher(
                 }
                 return listOf("$path: Expected ${expected.toPrettyString()} but got ${got.toPrettyString()}")
             }
-            JsonNodeType.POJO -> {
+            JsonNodeType.MISSING, JsonNodeType.POJO, JsonNodeType.BINARY -> {
+                throw IllegalArgumentException("JSON shouldn't include ${expected.nodeType}. But got ${expected.toPrettyString()}")
+
             }
         }
-        throw IllegalStateException("[BUG] Should not reach here: ${expected.nodeType}")
     }
 
     private fun matchMarker(marker: String, got: JsonNode, path: String): List<String> {
-        // TODO more marker types
+        // TODO more marker types https://github.com/intuit/karate#ignore-or-validate
         when (marker) {
             "#number" -> {
                 if (got.isNumber) {

@@ -24,6 +24,13 @@ internal class FuzzyMatcherTest {
             arguments("null", "null", listOf<String>()),
             arguments("false", "null", listOf("\$: Expected null but got false")),
 
+            // null
+            arguments("[]", "[]", listOf<String>()),
+            arguments("[1,2,3]", "[1,2,3]", listOf<String>()),
+            arguments("[1,2]", "[1,2,3]", listOf("\$: Expected list size is 3 but got 2: [ 1, 2 ]")),
+            arguments("[1,2,[3]]", "[1,2,[3]]", listOf<String>()),
+            arguments("[1,2,[4]]", "[1,2,[3]]", listOf("\$.3.1: Expected 3 but got 4")),
+
             // boolean
             arguments("false", "false", listOf<String>()),
             arguments("true", "false", listOf("\$: Expected false but got true")),
