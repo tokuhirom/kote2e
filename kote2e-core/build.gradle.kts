@@ -1,9 +1,9 @@
 dependencies {
+    implementation(project(":kote2e-matcher"))
+
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("test"))
 
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.10.2")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.2")
     implementation("com.jayway.jsonpath:json-path:2.4.0")
 
     implementation("com.squareup.okhttp3:okhttp:4.3.1")

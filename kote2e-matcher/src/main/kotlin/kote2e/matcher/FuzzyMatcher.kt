@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.JsonNodeType
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import java.lang.IllegalStateException
 
 class FuzzyMatcher(
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
