@@ -1,5 +1,6 @@
 package kote2e
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -44,6 +45,14 @@ class GivenContext(
         requestBody = body.toRequestBody()
         if (!::contentType.isInitialized) {
             contentType = "application/octet-stream"
+            contentTypeAutoSet = true
+        }
+    }
+
+    fun request(body: Any) {
+        requestBody = jacksonObjectMapper().writeValueAsBytes(body).toRequestBody()
+        if (!::contentType.isInitialized) {
+            contentType = "application/json"
             contentTypeAutoSet = true
         }
     }

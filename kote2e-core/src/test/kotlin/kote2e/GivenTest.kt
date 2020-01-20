@@ -32,8 +32,10 @@ class GivenTest {
 
 
     @Test
-    fun request() {
+    fun requestJsonAsString() {
         server { request ->
+            assertEquals("application/json", request.getHeader("content-type"))
+
             val body = request.body.readString(StandardCharsets.UTF_8)
             MockResponse()
                 .setBody(body)
@@ -51,6 +53,32 @@ class GivenTest {
                 .Then {
                     status shouldBe 200
                     response shouldBe """{"id":4649}"""
+                }
+        }
+    }
+
+    @Test
+    fun requestJsonFromObject() {
+        server { request ->
+            assertEquals("application/json", request.getHeader("content-type"))
+
+            val body = request.body.readString(StandardCharsets.UTF_8)
+            MockResponse()
+                .setBody(body)
+                .setResponseCode(200)
+        }.use { server ->
+            val bg = Background {
+                url = server.url("/").toString()
+            }
+            bg
+                .Given {
+                    path = "/"
+                    request(mapOf("hello" to "world"))
+                }
+                .When { method = "POST" }
+                .Then {
+                    status shouldBe 200
+                    response shouldBe """{"hello":"world"}"""
                 }
         }
     }

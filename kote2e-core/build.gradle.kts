@@ -6,6 +6,9 @@ dependencies {
 
     implementation("com.jayway.jsonpath:json-path:2.4.0")
 
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.10.2")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.2")
+
     implementation("com.squareup.okhttp3:okhttp:4.3.1")
     implementation("com.squareup.okhttp3:logging-interceptor:4.3.1")
 
