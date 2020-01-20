@@ -84,6 +84,12 @@ Send HTTP header.
 
     bg.Given { header("Content-Type", "application/json") }
 
+#### cookie
+
+Send cookie value
+
+    bg.Given { cookie("foo", "bar") }
+
 ## See also
 
  * https://github.com/intuit/karate

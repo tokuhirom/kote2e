@@ -1,6 +1,7 @@
 package kote2e
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -16,6 +17,7 @@ class GivenContext(
     private lateinit var contentType: String
     private var contentTypeAutoSet = false
     private val params = ArrayList<Pair<String, String>>()
+    private val cookies = ArrayList<Pair<String, String>>()
 
     var path: String = "/"
 
@@ -53,8 +55,12 @@ class GivenContext(
         }
     }
 
-    fun param(key: String, value: String) {
-        params.add(key to value)
+    fun param(name: String, value: String) {
+        params.add(name to value)
+    }
+
+    fun cookie(name: String, value: String) {
+        cookies.add(name to value)
     }
 
     fun read(path: String): ByteArray {
@@ -71,6 +77,10 @@ class GivenContext(
             urlBuilder.addQueryParameter(it.first, it.second)
         }
         requestBuilder.url(urlBuilder.build())
+
+        // cookie
+        requestBuilder.addHeader("Cookie",
+            cookies.joinToString("; ") { """${it.first}=${it.second}""" })
 
         if (contentTypeAutoSet) {
             requestBuilder.header("content-type", contentType)

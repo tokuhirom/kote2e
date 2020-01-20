@@ -1,6 +1,7 @@
 package kote2e
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import okhttp3.Cookie
 import okhttp3.mockwebserver.MockResponse
 import org.junit.Test
 import java.nio.charset.StandardCharsets
@@ -130,6 +131,30 @@ class GivenTest {
                     path = "/foo/bar"
                     param("name", "太郎")
                     param("x[]", "次郎")
+                }
+                .When { method = "GET" }
+                .Then {
+                    status shouldBe 200
+                }
+        }
+    }
+
+    @Test
+    fun cookie() {
+        server { request ->
+            val rawCookie = request.getHeader("cookie")!!
+            assertEquals("foo=bar; aaa=bbb", rawCookie)
+
+            MockResponse()
+                .setResponseCode(200)
+        }.use { server ->
+            val bg = Background {
+                url = server.url("/").toString()
+            }
+            bg
+                .Given {
+                    cookie("foo", "bar")
+                    cookie("aaa", "bbb")
                 }
                 .When { method = "GET" }
                 .Then {
