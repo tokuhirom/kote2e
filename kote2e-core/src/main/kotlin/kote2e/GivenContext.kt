@@ -1,11 +1,11 @@
 package kote2e
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.net.URI
 
 class GivenContext(
     private val okHttpClient: OkHttpClient,
@@ -15,13 +15,9 @@ class GivenContext(
     private lateinit var requestBody: RequestBody
     private lateinit var contentType: String
     private var contentTypeAutoSet = false
+    private val params = ArrayList<Pair<String, String>>()
 
-    var path: String? = null
-        set(value) {
-            if (value != null) {
-                requestBuilder.url(URI(baseUrl).resolve(value).toURL())
-            }
-        }
+    var path: String = "/"
 
     fun header(name: String, value: String) {
         if (name.toLowerCase() == "content-type") {
@@ -57,12 +53,25 @@ class GivenContext(
         }
     }
 
+    fun param(key: String, value: String) {
+        params.add(key to value)
+    }
+
     fun read(path: String): ByteArray {
-        return javaClass.classLoader.getResourceAsStream(path).readBytes()
+        return javaClass.classLoader.getResourceAsStream(path)
+            .use { it!!.readBytes() }
     }
 
     @Suppress("FunctionName")
     fun When(cb: WhenContext.() -> Unit): WhenContext {
+        val urlBuilder = baseUrl.toHttpUrlOrNull()!!
+            .newBuilder()
+            .encodedPath(path)
+        params.forEach {
+            urlBuilder.addQueryParameter(it.first, it.second)
+        }
+        requestBuilder.url(urlBuilder.build())
+
         if (contentTypeAutoSet) {
             requestBuilder.header("content-type", contentType)
         }

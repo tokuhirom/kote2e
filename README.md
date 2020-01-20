@@ -70,7 +70,13 @@ The HTTP verb - get, post, put, delete, patch, options, head, connect, trace.
 
 #### param
 
-TODO: support
+Set query parameter to the request.
+
+    bg.Given {
+        param("name", "John")
+        param("gender", "Male")
+    }
+
 
 #### header
 

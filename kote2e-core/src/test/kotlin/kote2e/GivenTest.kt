@@ -1,9 +1,11 @@
 package kote2e
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import okhttp3.mockwebserver.MockResponse
 import org.junit.Test
 import java.nio.charset.StandardCharsets
 import kotlin.test.assertEquals
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 
 class GivenTest {
@@ -104,6 +106,34 @@ class GivenTest {
                 .Then {
                     status shouldBe 200
                     response shouldBe """abcdefg"""
+                }
+        }
+    }
+
+    @Test
+    fun param() {
+        server { request ->
+            val url = request.requestUrl!!
+            assertEquals("/foo/bar", url.encodedPath)
+            assertEquals(setOf("name", "x[]"), url.queryParameterNames)
+            assertEquals(listOf("太郎"), url.queryParameterValues("name"))
+            assertEquals(listOf("次郎"), url.queryParameterValues("x[]"))
+
+            MockResponse()
+                .setResponseCode(200)
+        }.use { server ->
+            val bg = Background {
+                url = server.url("/").toString()
+            }
+            bg
+                .Given {
+                    path = "/foo/bar"
+                    param("name", "太郎")
+                    param("x[]", "次郎")
+                }
+                .When { method = "GET" }
+                .Then {
+                    status shouldBe 200
                 }
         }
     }
