@@ -90,6 +90,22 @@ Send cookie value
 
     bg.Given { cookie("foo", "bar") }
 
+#### form fields
+
+TBI
+
+#### multipart fields
+
+TBI
+
+#### multipart files
+
+TBI
+
+## Fuzzy Matching
+
+TBI
+
 ## See also
 
  * https://github.com/intuit/karate
